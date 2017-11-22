@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+<head>
+<title>QRCode generator</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+
+<script type="text/javascript" src="scripts/jszip.min.js"></script>
+<script type="text/javascript" src="scripts/FileSaver.min.js"></script>
+<script type="text/javascript" src="scripts/jquery.min.js"></script>
+<script type="text/javascript" src="scripts/qrcode.js"></script>
+
+
+</head>
+<body>
+
+<img src="images/mgtbanner.jpg" alt="header image" >
+
+<table>
+	<tr>
+		<td>QR Code Generator</td>
+	</tr>
+</table>
+<br>
+
+<form name="myform" id="myform">
+
+<label>Text1</label> &nbsp;&nbsp;&nbsp;
+<input type="text" name="text1" id="text1" size="40"> <br><br>
+
+<label>URL</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="text" name="text2" id="text2" size="40"> <br><br>
+
+<label>Email</label> &nbsp;&nbsp;&nbsp;
+<input type="text" name="text3" id="text3" size="40"> <br><br>
+
+<label>Phone</label> &nbsp;&nbsp;
+<input type="text" name="text4" id="text4"> <br><br>
+
+
+<input type="button" name="submit" id="submit" value="Submit">&nbsp;&nbsp;&nbsp;&nbsp; 
+<input type="button" name="zipdownload" value="DownloadZip" id="zipdownload">
+
+</form>
+
+<div id="qrcode" style="width:100px; height:100px; margin-top:15px;">
+
+
+</div>
+
+<div id="qrimages">
+	
+</div>
+
+<script type="text/javascript">
+
+function makeCode (elText, i) {		
+
+
+	oCanvas = document.getElementById("qrcode");
+        var qrcode = new QRCode(oCanvas, {
+            render: elText,
+            text: i,
+            width: 100,
+            height: 100,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H,
+
+        });
+
+		qrcode.makeCode(elText);
+
+
+}
+
+
+	$('#submit').click(function () {
+
+		var $inputs =$('#myform :input');
+
+		var values = {};
+		var j = 1;
+	    $inputs.each(function() {
+	        // values[this.name] = $(this).val();
+	        textinput = $(this).val();
+	        if (textinput.trim() != 'Submit' && textinput.trim() != 'DownloadZip') 
+	        {
+	        	makeCode(textinput, j);
+	        	j++;
+	        }
+	        else
+	        {
+	        	console.log("textinput " + textinput);
+	        }
+	        
+	    });
+
+	     
+	});
+
+
+	$('#zipdownload').click(function () {
+
+		$('#qrcode').html("");
+
+		var zip = new JSZip();
+
+		var $inputs =$('#myform :input');
+
+		var values = {};
+		var j = 1;
+	    $inputs.each(function() {
+	        // values[this.name] = $(this).val();
+	        textinput = $(this).val();
+	        if (textinput.trim() != 'Submit' && textinput.trim() != 'DownloadZip') 
+	        {
+	        	makeCode(textinput, j);
+	        	j++;
+	        }
+	        else
+	        {
+	        	console.log("textinput " + textinput);
+	        }
+	    });
+
+
+		var exceldata = [];
+		var objdata = {};
+
+		zip.file("Hello.txt", "Hello World\n");
+
+		var img = zip.folder("images");
+
+		var i=1;
+		$('#qrcode').find('a').each(function() {
+
+		    var imgname = $(this).attr('download');
+		    var imgbase64 = $(this).attr('href');
+		    var imgsrc = imgbase64.split(',');
+		    var imgData = imgsrc[1];
+		    img.file(imgname, imgData, {base64: true});
+		    objdata[i] = imgname;
+			exceldata.push(objdata);
+			objdata = {};
+			i++;
+		});
+
+		console.log(JSON.stringify(exceldata));
+
+	 	zip.file("file.csv", exceldata);
+
+		zip.generateAsync({type:"blob"})
+		.then(function(content) {
+		    saveAs(content, "archive.zip");
+		});
+
+
+	});
+
+</script>
+</body>

@@ -1,22 +1,29 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
 <head>
-<title>Cross-Browser QRCode generator for Javascript</title>
+<title>QRCode generator</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
-<script type="text/javascript" src="jszip.min.js"></script>
-<script type="text/javascript" src="FileSaver.min.js"></script>
-<script type="text/javascript" src="jquery.min.js"></script>
+
+<script type="text/javascript" src="scripts/jszip.min.js"></script>
+<script type="text/javascript" src="scripts/FileSaver.min.js"></script>
+<script type="text/javascript" src="scripts/jquery.min.js"></script>
+<script type="text/javascript" src="scripts/qrcode.js"></script>
 
 
-<script type="text/javascript" src="qrcode.js"></script>
-
-<!-- <script type="text/javascript" src="https://cdn.rawgit.com/davidshimjs/qrcodejs/master/qrcode.js"></script> -->
 </head>
 <body>
-<!-- <input id="text" type="text" value="http://jindo.dev.naver.com/collie" style="width:80%" /><br /> -->
+
+<img src="images/mgtbanner.jpg" alt="header image" >
+
+<table>
+	<tr>
+		<td>QR Code Generator</td>
+	</tr>
+</table>
+
 <textarea id="text" name="text" cols="50" rows="4"></textarea> </br></br>
-<input type="button" name="submit" value="submit">&nbsp;&nbsp;&nbsp;&nbsp; 
+<input type="button" name="submit" value="Submit">&nbsp;&nbsp;&nbsp;&nbsp; 
 <input type="button" name="zipdownload" value="DownloadZip" id="zipdownload">
 <div id="qrcode" style="width:100px; height:100px; margin-top:15px;">
 
@@ -54,8 +61,6 @@ function makeCode (elText, i) {
 		$('#qrcode').html("");
 		var lines = $('#text').val().split('\n');
 		for(var i = 0;i < lines.length;i++){
-		    //code here using lines[i] which will give you each line
-		    console.log("line " + i + " " + lines[i]);
 
 		    makeCode(lines[i], i);
 		}
@@ -70,7 +75,6 @@ function makeCode (elText, i) {
 
 		var lines = $('#text').val().split('\n');
 		for(var i = 0;i < lines.length;i++){
-		    //code here using lines[i] which will give you each line
 		    console.log("line " + i + " " + lines[i]);
 
 		    makeCode(lines[i], i);
@@ -83,7 +87,6 @@ function makeCode (elText, i) {
 		zip.file("Hello.txt", "Hello World\n");
 
 		var img = zip.folder("images");
-		// img.file("smile.gif", imgData, {base64: true});
 
 		var i=1;
 		$('#qrcode').find('a').each(function() {
@@ -92,7 +95,6 @@ function makeCode (elText, i) {
 		    var imgbase64 = $(this).attr('href');
 		    var imgsrc = imgbase64.split(',');
 		    var imgData = imgsrc[1];
-		    // console.log(imgsrc[0]);
 		    img.file(imgname, imgData, {base64: true});
 		    objdata[i] = imgname;
 			exceldata.push(objdata);
@@ -102,14 +104,7 @@ function makeCode (elText, i) {
 
 		console.log(JSON.stringify(exceldata));
 
-		// var data1 = [{a:1,b:10},{a:2,b:20}];
-	 //    var opts = [{sheetid:'One',header:true},{sheetid:'Two',header:false}];
-	 //    img.res = alasql('SELECT * INTO XLSX("restest344b.xlsx",?) FROM ?',
-	 //                     [opts,[data1]]);
-	    
-
 	 	zip.file("file.csv", exceldata);
-
 
 		zip.generateAsync({type:"blob"})
 		.then(function(content) {
